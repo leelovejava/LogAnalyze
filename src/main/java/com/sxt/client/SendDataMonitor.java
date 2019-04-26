@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 /**
  * 发送url数据的监控者，用于启动一个单独的线程来发送数据
- * 
+ *  BlockingQueue（阻塞队列）详解 https://www.cnblogs.com/tjudzj/p/4454490.html
  * @author root
  *
  */

@@ -64,6 +64,11 @@ Hourly分析
     
     分析各个不同地域的活跃访客数量   
 
+### 各区域热门商品统计分析
+
+    各区域Top3商品统计
+        实现每天统计出各个区域的top3热门商品。该模块可以让企业管理层看到公司售卖的商品的整体情况，从而对公司的商品相关的战略进行调整。主要使用Spark SQL实现
+        
 ### 6、用户访问深度分析模块
    
     该模块主要分析用户的访问记录的深度
@@ -98,4 +103,80 @@ Hourly分析
     
 ### 9、事件分析模块
   
-  例如: 订单相关事件 
+  例如: 订单相关事件
+
+### 10、广告点击流量实时统计
+    
+    简介:
+    
+        该模块负责实时统计公司的广告流量，包括广告展现流量和广告点击流量。
+    
+        实现动态黑名单机制，以及黑名单过滤；
+    
+        实现滑动窗口内的各城市的广告展现流量和广告点击流量的统计；
+    
+        实现每个区域每个广告的点击流量实时统计；
+    
+        实现每个区域top3点击量的广告的统计。主要使用Spark Streaming实现
+    
+    需求:   
+    
+        广告统计用户黑名单
+    
+        广告点击实时统计
+    
+        实时统计各省最热广告
+    
+        最近一小时广告点击趋势统计
+
+### 数据可视化
+
+常见的可视化框架
+1）echarts
+2）highcharts
+3）D3.js
+4）HUE 
+5）Zeppelin
+  
+## 埋点SDK
+
+### 埋点
+
+[智能推荐之埋点技术应用与实践](https://mp.weixin.qq.com/s/kHp_LWc2OnVdPJqnDwY_pQ)
+
+[美团点评前端无痕埋点实践](https://mp.weixin.qq.com/s/ybf9eIJuvOJFRPql4WWh1w)
+
+[数据采集技术揭秘：手把手教你全埋点技术解决方案](https://mp.weixin.qq.com/s/fCeJzVveMIdDFwg4wfOgLQ)
+
+[【经验】如何做好数据埋点](https://mp.weixin.qq.com/s/ry-uXBUSA6RUbnwWXCmluQ)
+
+Java SDK: 订单支付和退款
+JS SDK
+
+## 数据处理流程
+1）数据采集
+	Flume： web日志写入到HDFS
+
+2）数据清洗
+	脏数据
+	Spark、Hive、MapReduce 或者是其他的一些分布式计算框架  
+	清洗完之后的数据可以存放在HDFS(Hive/Spark SQL)
+
+3）数据处理
+	按照我们的需要进行相应业务的统计和分析
+	Spark、Hive、MapReduce 或者是其他的一些分布式计算框架
+
+4）处理结果入库
+	结果可以存放到RDBMS、NoSQL
+
+5）数据的可视化
+	通过图形化展示的方式展现出来：饼图、柱状图、地图、折线图
+	ECharts、HUE、Zeppelin
+
+## 技术选型
+   
+   存储格式的选择：http://www.infoq.com/cn/articles/bigdata-store-choose/
+   
+   压缩格式的选择：https://www.ibm.com/developerworks/cn/opensource/os-cn-hadoop-compression-analysis/
+
+   

@@ -12,16 +12,17 @@ import java.util.Hashtable;
 import java.util.List;
 
 /**
- * * 用来读取QQwry.dat文件，以根据ip获得好友位置，QQwry.dat的格式是 一. 文件头，共8字节 1. 第一个起始IP的绝对偏移， 4字节
+ * * 用来读取QQwry.dat文件，以根据ip获得好友位置，QQwry.dat的格式是 一. 文件头，共8字节
+ * 1. 第一个起始IP的绝对偏移， 4字节
  * 2. 最后一个起始IP的绝对偏移， 4字节 二. "结束地址/国家/区域"记录区 四字节ip地址后跟的每一条记录分成两个部分 1. 国家记录 2.
  * 地区记录 但是地区记录是不一定有的。而且国家记录和地区记录都有两种形式 1. 以0结束的字符串 2. 4个字节，一个字节可能为0x1或0x2 a.
  * 为0x1时，表示在绝对偏移后还跟着一个区域的记录，注意是绝对偏移之后，而不是这四个字节之后 b. 为0x2时，表示在绝对偏移后没有区域记录
  * 不管为0x1还是0x2，后三个字节都是实际国家名的文件内绝对偏移
  * 如果是地区记录，0x1和0x2的含义不明，但是如果出现这两个字节，也肯定是跟着3个字节偏移，如果不是 则为0结尾字符串 三.
  * "起始地址/结束地址偏移"记录区 1. 每条记录7字节，按照起始地址从小到大排列 a. 起始IP地址，4字节 b. 结束ip地址的绝对偏移，3字节
- * 
+ * <p>
  * 注意，这个文件里的ip地址和所有的偏移量均采用little-endian格式，而java是采用 big-endian格式的，要注意转换
- * 
+ *
  * @author root
  */
 public class IPSeeker {
@@ -46,7 +47,19 @@ public class IPSeeker {
     private byte[] b4;
     private byte[] b3;
 
-    /** */
+    /**
+     * 根据IP解析出城市信息的工具类
+     * 使用github上已有的开源项目
+     * 1）git clone https://github.com/wzhe06/ipdatabase.git
+     * 2）编译下载的项目：mvn clean package -DskipTests
+     * 3）安装jar包到自己的maven仓库
+     * mvn install:install-file -Dfile=/Users/rocky/source/ipdatabase/target/ipdatabase-1.0-SNAPSHOT.jar -DgroupId=com.ggstar -DartifactId=ipdatabase -Dversion=1.0 -Dpackaging=jar
+     * 4）可能遇到的问题
+     * java.io.FileNotFoundException:
+     * file:/Users/rocky/maven_repos/com/ggstar/ipdatabase/1.0/ipdatabase-1.0.jar!/ipRegion.xlsx (No such file or directory)
+     * 解决方案：需要把ipdatabase 下面ipDatabase.csv,ipRegion.xlsx 两个文件拷贝到resource文件夹下面
+     */
+
     /**
      * 私有构造函数
      */
@@ -94,9 +107,8 @@ public class IPSeeker {
     /** */
     /**
      * 给定一个地点的不完全名字，得到一系列包含s子串的IP范围记录
-     * 
-     * @param s
-     *            地点子串
+     *
+     * @param s 地点子串
      * @return 包含IPEntry类型的List
      */
     public List getIPEntriesDebug(String s) {
@@ -130,9 +142,8 @@ public class IPSeeker {
     /** */
     /**
      * 给定一个地点的不完全名字，得到一系列包含s子串的IP范围记录
-     * 
-     * @param s
-     *            地点子串
+     *
+     * @param s 地点子串
      * @return 包含IPEntry类型的List
      */
     public List getIPEntries(String s) {
@@ -175,7 +186,7 @@ public class IPSeeker {
     /** */
     /**
      * 从内存映射文件的offset位置开始的3个字节读取一个int
-     * 
+     *
      * @param offset
      * @return
      */
@@ -187,7 +198,7 @@ public class IPSeeker {
     /** */
     /**
      * 从内存映射文件的当前位置开始的3个字节读取一个int
-     * 
+     *
      * @return
      */
     private int readInt3() {
@@ -197,9 +208,8 @@ public class IPSeeker {
     /** */
     /**
      * 根据IP得到国家名
-     * 
-     * @param ip
-     *            ip的字节数组形式
+     *
+     * @param ip ip的字节数组形式
      * @return 国家名字符串
      */
     public String getCountry(byte[] ip) {
@@ -222,9 +232,8 @@ public class IPSeeker {
     /** */
     /**
      * 根据IP得到国家名
-     * 
-     * @param ip
-     *            IP的字符串形式
+     *
+     * @param ip IP的字符串形式
      * @return 国家名字符串
      */
     public String getCountry(String ip) {
@@ -234,9 +243,8 @@ public class IPSeeker {
     /** */
     /**
      * 根据IP得到地区名
-     * 
-     * @param ip
-     *            ip的字节数组形式
+     *
+     * @param ip ip的字节数组形式
      * @return 地区名字符串
      */
     public String getArea(byte[] ip) {
@@ -258,9 +266,8 @@ public class IPSeeker {
 
     /**
      * 根据IP得到地区名
-     * 
-     * @param ip
-     *            IP的字符串形式
+     *
+     * @param ip IP的字符串形式
      * @return 地区名字符串
      */
     public String getArea(String ip) {
@@ -270,9 +277,8 @@ public class IPSeeker {
     /** */
     /**
      * 根据ip搜索ip信息文件，得到IPLocation结构，所搜索的ip参数从类成员ip中得到
-     * 
-     * @param ip
-     *            要查询的IP
+     *
+     * @param ip 要查询的IP
      * @return IPLocation结构
      */
     public IPLocation getIPLocation(byte[] ip) {
@@ -290,7 +296,7 @@ public class IPSeeker {
 
     /**
      * 从offset位置读取4个字节为一个long，因为java为big-endian格式，所以没办法 用了这么一个函数来做转换
-     * 
+     *
      * @param offset
      * @return 读取的long值，返回-1表示读取文件失败
      */
@@ -310,7 +316,7 @@ public class IPSeeker {
 
     /**
      * 从offset位置读取3个字节为一个long，因为java为big-endian格式，所以没办法 用了这么一个函数来做转换
-     * 
+     *
      * @param offset
      * @return 读取的long值，返回-1表示读取文件失败
      */
@@ -330,7 +336,7 @@ public class IPSeeker {
 
     /**
      * 从当前位置读取3个字节转换成long
-     * 
+     *
      * @return
      */
     private long readLong3() {
@@ -349,7 +355,7 @@ public class IPSeeker {
     /**
      * 从offset位置读取四个字节的ip地址放入ip数组中，读取后的ip为big-endian格式，但是
      * 文件中是little-endian形式，将会进行转换
-     * 
+     *
      * @param offset
      * @param ip
      */
@@ -371,7 +377,7 @@ public class IPSeeker {
     /**
      * 从offset位置读取四个字节的ip地址放入ip数组中，读取后的ip为big-endian格式，但是
      * 文件中是little-endian形式，将会进行转换
-     * 
+     *
      * @param offset
      * @param ip
      */
@@ -388,11 +394,9 @@ public class IPSeeker {
 
     /**
      * 把类成员ip和beginIp比较，注意这个beginIp是big-endian的
-     * 
-     * @param ip
-     *            要查询的IP
-     * @param beginIp
-     *            和被查询IP相比较的IP
+     *
+     * @param ip      要查询的IP
+     * @param beginIp 和被查询IP相比较的IP
      * @return 相等返回0，ip大于beginIp则返回1，小于返回-1。
      */
     private int compareIP(byte[] ip, byte[] beginIp) {
@@ -406,7 +410,7 @@ public class IPSeeker {
 
     /**
      * 把两个byte当作无符号数进行比较
-     * 
+     *
      * @param b1
      * @param b2
      * @return 若b1大于b2则返回1，相等返回0，小于返回-1
@@ -422,9 +426,8 @@ public class IPSeeker {
 
     /**
      * 这个方法将根据ip的内容，定位到包含这个ip国家地区的记录处，返回一个绝对偏移 方法使用二分法查找。
-     * 
-     * @param ip
-     *            要查询的IP
+     *
+     * @param ip 要查询的IP
      * @return 如果找到了，返回结束IP的偏移，如果没有找到，返回-1
      */
     private long locateIP(byte[] ip) {
@@ -438,7 +441,7 @@ public class IPSeeker {
         else if (r < 0)
             return -1;
         // 开始二分搜索
-        for (long i = ipBegin, j = ipEnd; i < j;) {
+        for (long i = ipBegin, j = ipEnd; i < j; ) {
             m = getMiddleOffset(i, j);
             readIP(m, b4);
             r = compareIP(ip, b4);
@@ -467,7 +470,7 @@ public class IPSeeker {
 
     /**
      * 得到begin偏移和end偏移中间位置记录的偏移
-     * 
+     *
      * @param begin
      * @param end
      * @return
@@ -482,7 +485,7 @@ public class IPSeeker {
 
     /**
      * 给定一个ip国家地区记录的偏移，返回一个IPLocation结构
-     * 
+     *
      * @param offset
      * @return
      */
@@ -554,7 +557,7 @@ public class IPSeeker {
 
     /**
      * 从offset偏移开始解析后面的字节，读出一个地区名
-     * 
+     *
      * @param offset
      * @return 地区名字符串
      * @throws IOException
@@ -591,7 +594,7 @@ public class IPSeeker {
 
     /**
      * 从offset偏移处读取一个以0结束的字符串
-     * 
+     *
      * @param offset
      * @return 读取的字符串，出错返回空字符串
      */
@@ -611,7 +614,7 @@ public class IPSeeker {
 
     /**
      * 从内存映射文件的offset位置得到一个0结尾字符串
-     * 
+     *
      * @param offset
      * @return
      */
@@ -638,8 +641,7 @@ public class IPSeeker {
 
     /**
      * * 用来封装ip相关信息，目前只有两个字段，ip所在的国家和地区
-     * 
-     * 
+     *
      * @author swallow
      */
     public class IPLocation {
@@ -660,8 +662,7 @@ public class IPSeeker {
 
     /**
      * 一条IP范围记录，不仅包括国家和区域，也包括起始IP和结束IP *
-     * 
-     * 
+     *
      * @author root
      */
     public class IPEntry {
@@ -681,16 +682,14 @@ public class IPSeeker {
 
     /**
      * 操作工具类
-     * 
+     *
      * @author root
-     * 
      */
     public static class IPSeekerUtils {
         /**
          * 从ip的字符串形式得到字节数组形式
-         * 
-         * @param ip
-         *            字符串形式的ip
+         *
+         * @param ip 字符串形式的ip
          * @return 字节数组形式的ip
          */
         public static byte[] getIpByteArrayFromString(String ip) {
@@ -709,13 +708,10 @@ public class IPSeeker {
 
         /**
          * 对原始字符串进行编码转换，如果失败，返回原始的字符串
-         * 
-         * @param s
-         *            原始字符串
-         * @param srcEncoding
-         *            源编码方式
-         * @param destEncoding
-         *            目标编码方式
+         *
+         * @param s            原始字符串
+         * @param srcEncoding  源编码方式
+         * @param destEncoding 目标编码方式
          * @return 转换编码后的字符串，失败返回原始字符串
          */
         public static String getString(String s, String srcEncoding, String destEncoding) {
@@ -728,11 +724,9 @@ public class IPSeeker {
 
         /**
          * 根据某种编码方式将字节数组转换成字符串
-         * 
-         * @param b
-         *            字节数组
-         * @param encoding
-         *            编码方式
+         *
+         * @param b        字节数组
+         * @param encoding 编码方式
          * @return 如果encoding不支持，返回一个缺省编码的字符串
          */
         public static String getString(byte[] b, String encoding) {
@@ -745,15 +739,11 @@ public class IPSeeker {
 
         /**
          * 根据某种编码方式将字节数组转换成字符串
-         * 
-         * @param b
-         *            字节数组
-         * @param offset
-         *            要转换的起始位置
-         * @param len
-         *            要转换的长度
-         * @param encoding
-         *            编码方式
+         *
+         * @param b        字节数组
+         * @param offset   要转换的起始位置
+         * @param len      要转换的长度
+         * @param encoding 编码方式
          * @return 如果encoding不支持，返回一个缺省编码的字符串
          */
         public static String getString(byte[] b, int offset, int len, String encoding) {
@@ -765,8 +755,7 @@ public class IPSeeker {
         }
 
         /**
-         * @param ip
-         *            ip的字节数组形式
+         * @param ip ip的字节数组形式
          * @return 字符串形式的ip
          */
         public static String getIpStringFromBytes(byte[] ip) {
@@ -784,21 +773,21 @@ public class IPSeeker {
 
     /**
      * 获取全部ip地址集合列表
-     * 
+     *
      * @return
      */
     public List<String> getAllIp() {
-		List<String> list = new ArrayList<String>();
-		byte[] buf = new byte[4];
-		for (long i = ipBegin; i < ipEnd; i += IP_RECORD_LENGTH) {
-			try {
-				this.readIP(this.readLong3(i + 4), buf); // 读取ip，最终ip放到buf中
-				String ip = IPSeekerUtils.getIpStringFromBytes(buf);
-				list.add(ip);
-			} catch (Exception e) {
-				// nothing
-			}
-		}
-		return list;
-	}
+        List<String> list = new ArrayList<String>();
+        byte[] buf = new byte[4];
+        for (long i = ipBegin; i < ipEnd; i += IP_RECORD_LENGTH) {
+            try {
+                this.readIP(this.readLong3(i + 4), buf); // 读取ip，最终ip放到buf中
+                String ip = IPSeekerUtils.getIpStringFromBytes(buf);
+                list.add(ip);
+            } catch (Exception e) {
+                // nothing
+            }
+        }
+        return list;
+    }
 }
