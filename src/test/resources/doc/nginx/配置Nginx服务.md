@@ -1,28 +1,44 @@
-安装之前准备
+# nginx配置
 1、依赖 gcc openssl-devel pcre-devel zlib-devel
-	安装：yum install gcc openssl-devel pcre-devel zlib-devel -y
+	安装：
+> yum install gcc openssl-devel pcre-devel zlib-devel -y
 
-    wget http://nginx.org/download/nginx-1.15.12.tar.gz
+> wget http://nginx.org/download/nginx-1.15.12.tar.gz
 
 安装Nginx
-sudo ./configure --prefix=/hadoop000/app/nginx && make && make install
+> mkdir -p /hadoop000/app/nginx
+
+> sudo ./configure --prefix=/hadoop000/app/nginx && make && make install
 
 默认安装目录：
 whereis nginx
+
 /usr/local/nginx
 
 配置
-log_format my_format '$remote_addr^A$msec^A$http_host^A$request_uri';
-
-location = /log.gif {
-          default_type image/gif;
-          access_log /opt/data/access.log my_format;
+```
+http{
+    log_format my_format '$remote_addr^A$msec^A$http_host^A$request_uri';
 }
+server{
+    location = /log.gif {
+              #default_type image/gif;
+              #access_log /opt/data/access.log my_format;
+              # 开启响应1x1空白图片
+              empty_gif;
+    }
+}
+```
 
+命令
+sbin/nginx
+sbin/nginx -s reload
+sbin/nginx -s stop
 
 配置Nginx为系统服务，以方便管理
   1、在/etc/rc.d/init.d/目录中建立文本文件nginx
   2、在文件中粘贴下面的内容：
+```
 #!/bin/sh
 #
 # nginx - this script starts and stops the nginx daemon
@@ -44,9 +60,11 @@ location = /log.gif {
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 
+# nginx的安装目录
 nginx="/usr/local/nginx/sbin/nginx"
 prog=$(basename $nginx)
 
+# nginx配置目录
 NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf"
 
 [ -f /etc/sysconfig/nginx ] && . /etc/sysconfig/nginx
@@ -149,20 +167,51 @@ case "$1" in
         echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}"
         exit 2
 esac
+```
 
 3、修改nginx文件的执行权限
+	
 	chmod +x nginx
+	
+	chmod -R 777 root/app/nginx
+	
 4、添加该文件到系统服务中去
+	
 	chkconfig --add nginx
+	
 	查看是否添加成功
 	chkconfig --list nginx
 
 启动，停止，重新装载
-service nginx start|stop|reload
-
+    
+    service nginx start|stop|reload
+    systemctl
+    
 修改nginx.conf配置文件，达到保存日志信息的目的
 配置log.gif
 (须与客户端js文件的tracker的请求serverUrl : 保持一致）
 
 
+错误:
+1).
+    Failed to start SYSV: Nginx is an HTTP(S) server, HTTP(S) reverse proxy and IMAP/POP3 proxy server
+    
+    原因:
+    1.
+    /usr/local/nginx/sbin/nginx启动了nginx
+    解决:
+    kill -9 之前进程+
 
+    2. 指定nginx目录错误
+    修改配置并加载配置
+    systemctl daemon-reload
+
+2).
+    Reloading nginx configuration (via systemctl):  Job for nginx.service invalid.
+    
+    systemctl status nginx.service -l
+    
+    Unit nginx.service cannot be reloaded because it is inactive
+
+3).Nginx出现403 forbidden
+https://blog.csdn.net/qq_35843543/article/details/81561240    
