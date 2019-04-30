@@ -15,18 +15,16 @@ import com.sxt.util.TimeUtil;
 
 /**
  * 操作日期dimension 相关的udf
- * 
- * @author root
  *
+ * @author root
  */
 public class DateDimensionUDF extends UDF {
     private IDimensionConverter converter = new DimensionConverterImpl();
 
-   
 
     /**
      * 根据给定的日期（格式为:yyyy-MM-dd）至返回id
-     * 
+     *
      * @param day
      * @return
      */

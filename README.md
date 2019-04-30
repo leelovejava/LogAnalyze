@@ -208,7 +208,20 @@ JS SDK
 	通过图形化展示的方式展现出来：饼图、柱状图、地图、折线图
 	ECharts、HUE、Zeppelin
 
+### 3、数据清洗
+   [数据清洗的一些梳理](https://zhuanlan.zhihu.com/p/20571505)
+   [ETL数据清洗工具总结](https://blog.csdn.net/xiaoshunzi111/article/details/51881740)
+   
+    预处理阶段
+    阶段1: 去除/补全有缺失的数据
+    阶段2: 去除/修改格式和内容错误的数据
+    阶段3: 去除/修改逻辑错误的数据
+    阶段4: 去除不需要的数据
+    阶段5: 关联性验证
+    
 ## 技术选型
+   
+   IP解析:纯真IP数据库(qqwry.dat) https://blog.csdn.net/qq_19936739/article/details/73771028
    
    存储格式的选择：http://www.infoq.com/cn/articles/bigdata-store-choose/
    

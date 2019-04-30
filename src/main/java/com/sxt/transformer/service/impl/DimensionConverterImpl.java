@@ -1,18 +1,12 @@
 package com.sxt.transformer.service.impl;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.mysql.jdbc.Statement;
 import com.sxt.transformer.model.dim.base.BaseDimension;
 import com.sxt.transformer.model.dim.base.BrowserDimension;
 import com.sxt.transformer.model.dim.base.DateDimension;
@@ -32,7 +26,9 @@ public class DimensionConverterImpl implements IDimensionConverter {
 
         protected boolean removeEldestEntry(Map.Entry<String, Integer> eldest) {
             return this.size() > 5000;
-        };
+        }
+
+        ;
     };
 
     static {
@@ -67,7 +63,7 @@ public class DimensionConverterImpl implements IDimensionConverter {
                 sql = this.buildLocationSql();
             } else {
                 throw new IOException("不支持此dimensionid的获取:" + dimension.getClass());
-            } 
+            }
 
             conn = this.getConnection(); // 获取连接
             int id = 0;
@@ -92,7 +88,7 @@ public class DimensionConverterImpl implements IDimensionConverter {
 
     /**
      * 获取数据库connection连接
-     * 
+     *
      * @return
      * @throws SQLException
      */
@@ -102,7 +98,7 @@ public class DimensionConverterImpl implements IDimensionConverter {
 
     /**
      * 创建cache key
-     * 
+     *
      * @param dimension
      * @return
      */
@@ -139,7 +135,7 @@ public class DimensionConverterImpl implements IDimensionConverter {
 
     /**
      * 设置参数
-     * 
+     *
      * @param pstmt
      * @param dimension
      * @throws SQLException
@@ -175,62 +171,62 @@ public class DimensionConverterImpl implements IDimensionConverter {
 
     /**
      * 创建date dimension相关sql
-     * 
+     *
      * @return
      */
     private String[] buildDateSql() {
         String querySql = "SELECT `id` FROM `dimension_date` WHERE `year` = ? AND `season` = ? AND `month` = ? AND `week` = ? AND `day` = ? AND `type` = ? AND `calendar` = ?";
         String insertSql = "INSERT INTO `dimension_date`(`year`, `season`, `month`, `week`, `day`, `type`, `calendar`) VALUES(?, ?, ?, ?, ?, ?, ?)";
-        return new String[] { querySql, insertSql };
+        return new String[]{querySql, insertSql};
     }
 
     /**
      * 创建polatform dimension相关sql
-     * 
+     *
      * @return
      */
     private String[] buildPlatformSql() {
         String querySql = "SELECT `id` FROM `dimension_platform` WHERE `platform_name` = ?";
         String insertSql = "INSERT INTO `dimension_platform`(`platform_name`) VALUES(?)";
-        return new String[] { querySql, insertSql };
+        return new String[]{querySql, insertSql};
     }
 
     /**
      * 创建browser dimension相关sql
-     * 
+     *
      * @return
      */
     private String[] buildBrowserSql() {
         String querySql = "SELECT `id` FROM `dimension_browser` WHERE `browser_name` = ? AND `browser_version` = ?";
         String insertSql = "INSERT INTO `dimension_browser`(`browser_name`, `browser_version`) VALUES(?, ?)";
-        return new String[] { querySql, insertSql };
+        return new String[]{querySql, insertSql};
     }
 
     /**
      * 创建kpi dimension相关sql
-     * 
+     *
      * @return
      */
     private String[] buildKpiSql() {
         String querySql = "SELECT `id` FROM `dimension_kpi` WHERE `kpi_name` = ?";
         String insertSql = "INSERT INTO `dimension_kpi`(`kpi_name`) VALUES(?)";
-        return new String[] { querySql, insertSql };
+        return new String[]{querySql, insertSql};
     }
 
     /**
      * 创建location dimension相关sql
-     * 
+     *
      * @return
      */
     private String[] buildLocationSql() {
         String querySql = "SELECT `id` FROM `dimension_location` WHERE `country` = ? AND `province` = ? AND `city` = ?";
         String insertSql = "INSERT INTO `dimension_location`(`country`,`province`,`city`) VALUES(?,?,?)";
-        return new String[] { querySql, insertSql };
+        return new String[]{querySql, insertSql};
     }
 
     /**
      * 具体执行sql的方法
-     * 
+     *
      * @param conn
      * @param cacheKey
      * @param sqls
@@ -243,7 +239,8 @@ public class DimensionConverterImpl implements IDimensionConverter {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            pstmt = conn.prepareStatement(sqls[0]); // 创建查询sql的pstmt对象
+            // 创建查询sql的pstmt对象
+            pstmt = conn.prepareStatement(sqls[0]);
             // 设置参数
             this.setArgs(pstmt, dimension);
             rs = pstmt.executeQuery();

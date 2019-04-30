@@ -24,7 +24,8 @@ import com.sxt.etl.util.LoggerUtil;
  */
 public class AnalyserLogDataMapper extends Mapper<Object, Text, NullWritable, Put> {
     private final Logger logger = Logger.getLogger(AnalyserLogDataMapper.class);
-    private int inputRecords, filterRecords, outputRecords; // 主要用于标志，方便查看过滤数据
+    // 主要用于标志，方便查看过滤数据
+    private int inputRecords, filterRecords, outputRecords;
     private byte[] family = Bytes.toBytes(EventLogConstants.EVENT_LOGS_FAMILY_NAME);
     private CRC32 crc32 = new CRC32();
 

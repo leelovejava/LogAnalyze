@@ -3,6 +3,9 @@ package com.sxt;
 import com.sxt.etl.util.IPSeekerExt;
 import com.sxt.etl.util.LoggerUtil;
 
+/**
+ * 测试 日志工具类
+ */
 public class TestLoggerUtil {
     public static void main(String[] args) {
         String log = "192.168.100.102^A1449411239.595^A192.168.239.8^A/log.gif?c_time=1449411240818&oid=orderid456&u_mid=zhangsan&pl=java_server&en=e_cr&sdk=jdk&ver=1";

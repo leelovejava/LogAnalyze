@@ -2,9 +2,8 @@ package com.sxt.common;
 
 /**
  * 统计kpi的名称枚举类
- * 
- * @author root
  *
+ * @author root
  */
 public enum KpiType {
     /**
@@ -89,7 +88,7 @@ public enum KpiType {
 
     /**
      * 根据kpiType的名称字符串值，获取对应的kpitype枚举对象
-     * 
+     *
      * @param name
      * @return
      */

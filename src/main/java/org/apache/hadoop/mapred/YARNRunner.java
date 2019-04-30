@@ -97,18 +97,16 @@ public class YARNRunner implements ClientProtocol {
 
 	private static final Log LOG = LogFactory.getLog(YARNRunner.class);
 
-	private final RecordFactory recordFactory = RecordFactoryProvider
-			.getRecordFactory(null);
+	private final RecordFactory recordFactory = RecordFactoryProvider.getRecordFactory(null);
 	private ResourceMgrDelegate resMgrDelegate;
 	private ClientCache clientCache;
 	private Configuration conf;
 	private final FileContext defaultFileContext;
 
 	/**
-	 * Yarn runner incapsulates the client interface of yarn
-	 * 
-	 * @param conf
-	 *            the configuration object for the client
+	 * Yarn runner incapsulates the client interface of
+	 * yarn
+	 * @param conf the configuration object for the client
 	 */
 	public YARNRunner(Configuration conf) {
 		this(conf, new ResourceMgrDelegate(new YarnConfiguration(conf)));
@@ -117,30 +115,22 @@ public class YARNRunner implements ClientProtocol {
 	/**
 	 * Similar to {@link #YARNRunner(Configuration)} but allowing injecting
 	 * {@link ResourceMgrDelegate}. Enables mocking and testing.
-	 * 
-	 * @param conf
-	 *            the configuration object for the client
-	 * @param resMgrDelegate
-	 *            the resourcemanager client handle.
+	 * @param conf the configuration object for the client
+	 * @param resMgrDelegate the resourcemanager client handle.
 	 */
 	public YARNRunner(Configuration conf, ResourceMgrDelegate resMgrDelegate) {
 		this(conf, resMgrDelegate, new ClientCache(conf, resMgrDelegate));
 	}
 
 	/**
-	 * Similar to
-	 * {@link YARNRunner#YARNRunner(Configuration, ResourceMgrDelegate)} but
-	 * allowing injecting {@link ClientCache}. Enable mocking and testing.
-	 * 
-	 * @param conf
-	 *            the configuration object
-	 * @param resMgrDelegate
-	 *            the resource manager delegate
-	 * @param clientCache
-	 *            the client cache object.
+	 * Similar to {@link YARNRunner#YARNRunner(Configuration, ResourceMgrDelegate)}
+	 * but allowing injecting {@link ClientCache}. Enable mocking and testing.
+	 * @param conf the configuration object
+	 * @param resMgrDelegate the resource manager delegate
+	 * @param clientCache the client cache object.
 	 */
 	public YARNRunner(Configuration conf, ResourceMgrDelegate resMgrDelegate,
-			ClientCache clientCache) {
+					  ClientCache clientCache) {
 		this.conf = conf;
 		try {
 			this.resMgrDelegate = resMgrDelegate;
@@ -190,15 +180,13 @@ public class YARNRunner implements ClientProtocol {
 	}
 
 	@VisibleForTesting
-	void addHistoryToken(Credentials ts) throws IOException,
-			InterruptedException {
+	void addHistoryToken(Credentials ts) throws IOException, InterruptedException {
 		/* check if we have a hsproxy, if not, no need */
 		MRClientProtocol hsProxy = clientCache.getInitializedHSProxy();
 		if (UserGroupInformation.isSecurityEnabled() && (hsProxy != null)) {
 			/*
-			 * note that get delegation token was called. Again this is hack for
-			 * oozie to make sure we add history server delegation tokens to the
-			 * credentials
+			 * note that get delegation token was called. Again this is hack for oozie
+			 * to make sure we add history server delegation tokens to the credentials
 			 */
 			RMDelegationTokenSelector tokenSelector = new RMDelegationTokenSelector();
 			Text service = resMgrDelegate.getRMDelegationTokenService();
@@ -294,22 +282,24 @@ public class YARNRunner implements ClientProtocol {
 		addHistoryToken(ts);
 
 		// Construct necessary information to start the MR AM
-		ApplicationSubmissionContext appContext = createApplicationSubmissionContext(
-				conf, jobSubmitDir, ts);
+		ApplicationSubmissionContext appContext =
+				createApplicationSubmissionContext(conf, jobSubmitDir, ts);
 
 		// Submit to ResourceManager
 		try {
-			ApplicationId applicationId = resMgrDelegate
-					.submitApplication(appContext);
+			ApplicationId applicationId =
+					resMgrDelegate.submitApplication(appContext);
 
 			ApplicationReport appMaster = resMgrDelegate
 					.getApplicationReport(applicationId);
-			String diagnostics = (appMaster == null ? "application report is null"
-					: appMaster.getDiagnostics());
+			String diagnostics =
+					(appMaster == null ?
+							"application report is null" : appMaster.getDiagnostics());
 			if (appMaster == null
 					|| appMaster.getYarnApplicationState() == YarnApplicationState.FAILED
 					|| appMaster.getYarnApplicationState() == YarnApplicationState.KILLED) {
-				throw new IOException("Failed to run job : " + diagnostics);
+				throw new IOException("Failed to run job : " +
+						diagnostics);
 			}
 			return clientCache.getClient(jobId).getJobStatus(jobId);
 		} catch (YarnException e) {
@@ -317,10 +307,9 @@ public class YARNRunner implements ClientProtocol {
 		}
 	}
 
-	private LocalResource createApplicationResource(FileContext fs, Path p,
-			LocalResourceType type) throws IOException {
-		LocalResource rsrc = recordFactory
-				.newRecordInstance(LocalResource.class);
+	private LocalResource createApplicationResource(FileContext fs, Path p, LocalResourceType type)
+			throws IOException {
+		LocalResource rsrc = recordFactory.newRecordInstance(LocalResource.class);
 		FileStatus rsrcStat = fs.getFileStatus(p);
 		rsrc.setResource(ConverterUtils.getYarnUrlFromPath(fs
 				.getDefaultFileSystem().resolvePath(rsrcStat.getPath())));
@@ -332,117 +321,99 @@ public class YARNRunner implements ClientProtocol {
 	}
 
 	public ApplicationSubmissionContext createApplicationSubmissionContext(
-			Configuration jobConf, String jobSubmitDir, Credentials ts)
-			throws IOException {
+			Configuration jobConf,
+			String jobSubmitDir, Credentials ts) throws IOException {
 		ApplicationId applicationId = resMgrDelegate.getApplicationId();
 
 		// Setup resource requirements
 		Resource capability = recordFactory.newRecordInstance(Resource.class);
-		capability.setMemory(conf.getInt(MRJobConfig.MR_AM_VMEM_MB,
-				MRJobConfig.DEFAULT_MR_AM_VMEM_MB));
-		capability.setVirtualCores(conf.getInt(MRJobConfig.MR_AM_CPU_VCORES,
-				MRJobConfig.DEFAULT_MR_AM_CPU_VCORES));
+		capability.setMemory(
+				conf.getInt(
+						MRJobConfig.MR_AM_VMEM_MB, MRJobConfig.DEFAULT_MR_AM_VMEM_MB
+				)
+		);
+		capability.setVirtualCores(
+				conf.getInt(
+						MRJobConfig.MR_AM_CPU_VCORES, MRJobConfig.DEFAULT_MR_AM_CPU_VCORES
+				)
+		);
 		LOG.debug("AppMaster capability = " + capability);
 
 		// Setup LocalResources
-		Map<String, LocalResource> localResources = new HashMap<String, LocalResource>();
+		Map<String, LocalResource> localResources =
+				new HashMap<String, LocalResource>();
 
 		Path jobConfPath = new Path(jobSubmitDir, MRJobConfig.JOB_CONF_FILE);
 
 		URL yarnUrlForJobSubmitDir = ConverterUtils
 				.getYarnUrlFromPath(defaultFileContext.getDefaultFileSystem()
 						.resolvePath(
-								defaultFileContext.makeQualified(new Path(
-										jobSubmitDir))));
+								defaultFileContext.makeQualified(new Path(jobSubmitDir))));
 		LOG.debug("Creating setup context, jobSubmitDir url is "
 				+ yarnUrlForJobSubmitDir);
 
-		localResources.put(
-				MRJobConfig.JOB_CONF_FILE,
-				createApplicationResource(defaultFileContext, jobConfPath,
-						LocalResourceType.FILE));
+		localResources.put(MRJobConfig.JOB_CONF_FILE,
+				createApplicationResource(defaultFileContext,
+						jobConfPath, LocalResourceType.FILE));
 		if (jobConf.get(MRJobConfig.JAR) != null) {
 			Path jobJarPath = new Path(jobConf.get(MRJobConfig.JAR));
 			LocalResource rc = createApplicationResource(
 					FileContext.getFileContext(jobJarPath.toUri(), jobConf),
-					jobJarPath, LocalResourceType.PATTERN);
+					jobJarPath,
+					LocalResourceType.PATTERN);
 			String pattern = conf.getPattern(JobContext.JAR_UNPACK_PATTERN,
 					JobConf.UNPACK_JAR_PATTERN_DEFAULT).pattern();
 			rc.setPattern(pattern);
 			localResources.put(MRJobConfig.JOB_JAR, rc);
 		} else {
-			// Job jar may be null. For e.g, for pipes, the job jar is the
-			// hadoop
+			// Job jar may be null. For e.g, for pipes, the job jar is the hadoop
 			// mapreduce jar itself which is already on the classpath.
 			LOG.info("Job jar is not present. "
 					+ "Not adding any jar to the list of resources.");
 		}
 
 		// TODO gross hack
-		for (String s : new String[] { MRJobConfig.JOB_SPLIT,
+		for (String s : new String[] {
+				MRJobConfig.JOB_SPLIT,
 				MRJobConfig.JOB_SPLIT_METAINFO }) {
 			localResources.put(
 					MRJobConfig.JOB_SUBMIT_DIR + "/" + s,
-					createApplicationResource(defaultFileContext, new Path(
-							jobSubmitDir, s), LocalResourceType.FILE));
+					createApplicationResource(defaultFileContext,
+							new Path(jobSubmitDir, s), LocalResourceType.FILE));
 		}
 
 		// Setup security tokens
 		DataOutputBuffer dob = new DataOutputBuffer();
 		ts.writeTokenStorageToStream(dob);
-		ByteBuffer securityTokens = ByteBuffer.wrap(dob.getData(), 0,
-				dob.getLength());
+		ByteBuffer securityTokens  = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
 
 		// Setup the command to run the AM
 		List<String> vargs = new ArrayList<String>(8);
+		vargs.add(MRApps.crossPlatformifyMREnv(jobConf, Environment.JAVA_HOME)
+				+ "/bin/java");
 
-		/*
-		 * * rewrite java_home begin
-		 * vargs.add(MRApps.crossPlatformifyMREnv(jobConf,
-		 * Environment.JAVA_HOME) + "/bin/java");
-		 */
-		vargs.add("$JAVA_HOME/bin/java");
-		/*
-		 * * rewrite java_home end
-		 */
-
-		// TODO: why do we use 'conf' some places and 'jobConf' others?
-		long logSize = jobConf.getLong(MRJobConfig.MR_AM_LOG_KB,
-				MRJobConfig.DEFAULT_MR_AM_LOG_KB) << 10;
-		String logLevel = jobConf.get(MRJobConfig.MR_AM_LOG_LEVEL,
-				MRJobConfig.DEFAULT_MR_AM_LOG_LEVEL);
-		int numBackups = jobConf.getInt(MRJobConfig.MR_AM_LOG_BACKUPS,
-				MRJobConfig.DEFAULT_MR_AM_LOG_BACKUPS);
-		MRApps.addLog4jSystemProperties(logLevel, logSize, numBackups, vargs,
-				conf);
+		MRApps.addLog4jSystemProperties(null, vargs, conf);
 
 		// Check for Java Lib Path usage in MAP and REDUCE configs
-		warnForJavaLibPath(conf.get(MRJobConfig.MAP_JAVA_OPTS, ""), "map",
+		warnForJavaLibPath(conf.get(MRJobConfig.MAP_JAVA_OPTS,""), "map",
 				MRJobConfig.MAP_JAVA_OPTS, MRJobConfig.MAP_ENV);
-		warnForJavaLibPath(
-				conf.get(MRJobConfig.MAPRED_MAP_ADMIN_JAVA_OPTS, ""), "map",
-				MRJobConfig.MAPRED_MAP_ADMIN_JAVA_OPTS,
-				MRJobConfig.MAPRED_ADMIN_USER_ENV);
-		warnForJavaLibPath(conf.get(MRJobConfig.REDUCE_JAVA_OPTS, ""),
-				"reduce", MRJobConfig.REDUCE_JAVA_OPTS, MRJobConfig.REDUCE_ENV);
-		warnForJavaLibPath(
-				conf.get(MRJobConfig.MAPRED_REDUCE_ADMIN_JAVA_OPTS, ""),
-				"reduce", MRJobConfig.MAPRED_REDUCE_ADMIN_JAVA_OPTS,
-				MRJobConfig.MAPRED_ADMIN_USER_ENV);
+		warnForJavaLibPath(conf.get(MRJobConfig.MAPRED_MAP_ADMIN_JAVA_OPTS,""), "map",
+				MRJobConfig.MAPRED_MAP_ADMIN_JAVA_OPTS, MRJobConfig.MAPRED_ADMIN_USER_ENV);
+		warnForJavaLibPath(conf.get(MRJobConfig.REDUCE_JAVA_OPTS,""), "reduce",
+				MRJobConfig.REDUCE_JAVA_OPTS, MRJobConfig.REDUCE_ENV);
+		warnForJavaLibPath(conf.get(MRJobConfig.MAPRED_REDUCE_ADMIN_JAVA_OPTS,""), "reduce",
+				MRJobConfig.MAPRED_REDUCE_ADMIN_JAVA_OPTS, MRJobConfig.MAPRED_ADMIN_USER_ENV);
 
 		// Add AM admin command opts before user command opts
 		// so that it can be overridden by user
-		String mrAppMasterAdminOptions = conf.get(
-				MRJobConfig.MR_AM_ADMIN_COMMAND_OPTS,
+		String mrAppMasterAdminOptions = conf.get(MRJobConfig.MR_AM_ADMIN_COMMAND_OPTS,
 				MRJobConfig.DEFAULT_MR_AM_ADMIN_COMMAND_OPTS);
 		warnForJavaLibPath(mrAppMasterAdminOptions, "app master",
-				MRJobConfig.MR_AM_ADMIN_COMMAND_OPTS,
-				MRJobConfig.MR_AM_ADMIN_USER_ENV);
+				MRJobConfig.MR_AM_ADMIN_COMMAND_OPTS, MRJobConfig.MR_AM_ADMIN_USER_ENV);
 		vargs.add(mrAppMasterAdminOptions);
 
 		// Add AM user command opts
-		String mrAppMasterUserOptions = conf.get(
-				MRJobConfig.MR_AM_COMMAND_OPTS,
+		String mrAppMasterUserOptions = conf.get(MRJobConfig.MR_AM_COMMAND_OPTS,
 				MRJobConfig.DEFAULT_MR_AM_COMMAND_OPTS);
 		warnForJavaLibPath(mrAppMasterUserOptions, "app master",
 				MRJobConfig.MR_AM_COMMAND_OPTS, MRJobConfig.MR_AM_ENV);
@@ -450,21 +421,21 @@ public class YARNRunner implements ClientProtocol {
 
 		if (jobConf.getBoolean(MRJobConfig.MR_AM_PROFILE,
 				MRJobConfig.DEFAULT_MR_AM_PROFILE)) {
-			final String profileParams = jobConf.get(
-					MRJobConfig.MR_AM_PROFILE_PARAMS,
+			final String profileParams = jobConf.get(MRJobConfig.MR_AM_PROFILE_PARAMS,
 					MRJobConfig.DEFAULT_TASK_PROFILE_PARAMS);
 			if (profileParams != null) {
 				vargs.add(String.format(profileParams,
-						ApplicationConstants.LOG_DIR_EXPANSION_VAR
-								+ Path.SEPARATOR + TaskLog.LogName.PROFILE));
+						ApplicationConstants.LOG_DIR_EXPANSION_VAR + Path.SEPARATOR
+								+ TaskLog.LogName.PROFILE));
 			}
 		}
 
 		vargs.add(MRJobConfig.APPLICATION_MASTER_CLASS);
-		vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR
-				+ Path.SEPARATOR + ApplicationConstants.STDOUT);
-		vargs.add("2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR
-				+ Path.SEPARATOR + ApplicationConstants.STDERR);
+		vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR +
+				Path.SEPARATOR + ApplicationConstants.STDOUT);
+		vargs.add("2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR +
+				Path.SEPARATOR + ApplicationConstants.STDERR);
+
 
 		Vector<String> vargsFinal = new Vector<String>(8);
 		// Final command
@@ -483,20 +454,17 @@ public class YARNRunner implements ClientProtocol {
 		MRApps.setClasspath(environment, conf);
 
 		// Shell
-		environment
-				.put(Environment.SHELL.name(), conf.get(
-						MRJobConfig.MAPRED_ADMIN_USER_SHELL,
+		environment.put(Environment.SHELL.name(),
+				conf.get(MRJobConfig.MAPRED_ADMIN_USER_SHELL,
 						MRJobConfig.DEFAULT_SHELL));
 
-		// Add the container working directory in front of LD_LIBRARY_PATH
-		MRApps.addToEnvironment(environment,
-				Environment.LD_LIBRARY_PATH.name(),
+		// Add the container working directory at the front of LD_LIBRARY_PATH
+		MRApps.addToEnvironment(environment, Environment.LD_LIBRARY_PATH.name(),
 				MRApps.crossPlatformifyMREnv(conf, Environment.PWD), conf);
 
 		// Setup the environment variables for Admin first
-		MRApps.setEnvFromInputString(environment, conf.get(
-				MRJobConfig.MR_AM_ADMIN_USER_ENV,
-				MRJobConfig.DEFAULT_MR_AM_ADMIN_USER_ENV), conf);
+		MRApps.setEnvFromInputString(environment,
+				conf.get(MRJobConfig.MR_AM_ADMIN_USER_ENV), conf);
 		// Setup the environment variables (LD_LIBRARY_PATH, etc)
 		MRApps.setEnvFromInputString(environment,
 				conf.get(MRJobConfig.MR_AM_ENV), conf);
@@ -504,66 +472,58 @@ public class YARNRunner implements ClientProtocol {
 		// Parse distributed cache
 		MRApps.setupDistributedCache(jobConf, localResources);
 
-		Map<ApplicationAccessType, String> acls = new HashMap<ApplicationAccessType, String>(
-				2);
+		Map<ApplicationAccessType, String> acls
+				= new HashMap<ApplicationAccessType, String>(2);
 		acls.put(ApplicationAccessType.VIEW_APP, jobConf.get(
-				MRJobConfig.JOB_ACL_VIEW_JOB,
-				MRJobConfig.DEFAULT_JOB_ACL_VIEW_JOB));
+				MRJobConfig.JOB_ACL_VIEW_JOB, MRJobConfig.DEFAULT_JOB_ACL_VIEW_JOB));
 		acls.put(ApplicationAccessType.MODIFY_APP, jobConf.get(
 				MRJobConfig.JOB_ACL_MODIFY_JOB,
 				MRJobConfig.DEFAULT_JOB_ACL_MODIFY_JOB));
 
-		/*
-		 * Rewrite environment begin
-		 */
-		replaceEnvironment(environment);
-		/*
-		 * Rewrite environment end
-		 */
-
 		// Setup ContainerLaunchContext for AM container
-		ContainerLaunchContext amContainer = ContainerLaunchContext
-				.newInstance(localResources, environment, vargsFinal, null,
-						securityTokens, acls);
+		ContainerLaunchContext amContainer =
+				ContainerLaunchContext.newInstance(localResources, environment,
+						vargsFinal, null, securityTokens, acls);
 
-		Collection<String> tagsFromConf = jobConf
-				.getTrimmedStringCollection(MRJobConfig.JOB_TAGS);
+		Collection<String> tagsFromConf =
+				jobConf.getTrimmedStringCollection(MRJobConfig.JOB_TAGS);
 
 		// Set up the ApplicationSubmissionContext
-		ApplicationSubmissionContext appContext = recordFactory
-				.newRecordInstance(ApplicationSubmissionContext.class);
-		appContext.setApplicationId(applicationId); // ApplicationId
-		appContext.setQueue( // Queue name
+		ApplicationSubmissionContext appContext =
+				recordFactory.newRecordInstance(ApplicationSubmissionContext.class);
+		appContext.setApplicationId(applicationId);                // ApplicationId
+		appContext.setQueue(                                       // Queue name
 				jobConf.get(JobContext.QUEUE_NAME,
 						YarnConfiguration.DEFAULT_QUEUE_NAME));
 		// add reservationID if present
 		ReservationId reservationID = null;
 		try {
-			reservationID = ReservationId.parseReservationId(jobConf
-					.get(JobContext.RESERVATION_ID));
+			reservationID =
+					ReservationId.parseReservationId(jobConf
+							.get(JobContext.RESERVATION_ID));
 		} catch (NumberFormatException e) {
 			// throw exception as reservationid as is invalid
-			String errMsg = "Invalid reservationId: "
-					+ jobConf.get(JobContext.RESERVATION_ID)
-					+ " specified for the app: " + applicationId;
+			String errMsg =
+					"Invalid reservationId: " + jobConf.get(JobContext.RESERVATION_ID)
+							+ " specified for the app: " + applicationId;
 			LOG.warn(errMsg);
 			throw new IOException(errMsg);
 		}
 		if (reservationID != null) {
 			appContext.setReservationID(reservationID);
-			LOG.info("SUBMITTING ApplicationSubmissionContext app:"
-					+ applicationId + " to queue:" + appContext.getQueue()
-					+ " with reservationId:" + appContext.getReservationID());
+			LOG.info("SUBMITTING ApplicationSubmissionContext app:" + applicationId
+					+ " to queue:" + appContext.getQueue() + " with reservationId:"
+					+ appContext.getReservationID());
 		}
-		appContext.setApplicationName( // Job name
+		appContext.setApplicationName(                             // Job name
 				jobConf.get(JobContext.JOB_NAME,
 						YarnConfiguration.DEFAULT_APPLICATION_NAME));
-		appContext.setCancelTokensWhenComplete(conf.getBoolean(
-				MRJobConfig.JOB_CANCEL_DELEGATION_TOKEN, true));
-		appContext.setAMContainerSpec(amContainer); // AM Container
-		appContext.setMaxAppAttempts(conf.getInt(
-				MRJobConfig.MR_AM_MAX_ATTEMPTS,
-				MRJobConfig.DEFAULT_MR_AM_MAX_ATTEMPTS));
+		appContext.setCancelTokensWhenComplete(
+				conf.getBoolean(MRJobConfig.JOB_CANCEL_DELEGATION_TOKEN, true));
+		appContext.setAMContainerSpec(amContainer);         // AM Container
+		appContext.setMaxAppAttempts(
+				conf.getInt(MRJobConfig.MR_AM_MAX_ATTEMPTS,
+						MRJobConfig.DEFAULT_MR_AM_MAX_ATTEMPTS));
 		appContext.setResource(capability);
 		appContext.setApplicationType(MRJobConfig.MR_APPLICATION_TYPE);
 		if (tagsFromConf != null && !tagsFromConf.isEmpty()) {
@@ -590,6 +550,7 @@ public class YARNRunner implements ClientProtocol {
 		throw new UnsupportedOperationException("Use Token.renew instead");
 	}
 
+
 	@Override
 	public Counters getJobCounters(JobID arg0) throws IOException,
 			InterruptedException {
@@ -610,9 +571,8 @@ public class YARNRunner implements ClientProtocol {
 
 	@Override
 	public TaskCompletionEvent[] getTaskCompletionEvents(JobID arg0, int arg1,
-			int arg2) throws IOException, InterruptedException {
-		return clientCache.getClient(arg0).getTaskCompletionEvents(arg0, arg1,
-				arg2);
+														 int arg2) throws IOException, InterruptedException {
+		return clientCache.getClient(arg0).getTaskCompletionEvents(arg0, arg1, arg2);
 	}
 
 	@Override
@@ -624,7 +584,8 @@ public class YARNRunner implements ClientProtocol {
 	@Override
 	public TaskReport[] getTaskReports(JobID jobID, TaskType taskType)
 			throws IOException, InterruptedException {
-		return clientCache.getClient(jobID).getTaskReports(jobID, taskType);
+		return clientCache.getClient(jobID)
+				.getTaskReports(jobID, taskType);
 	}
 
 	private void killUnFinishedApplication(ApplicationId appId)
@@ -679,7 +640,10 @@ public class YARNRunner implements ClientProtocol {
 			clientCache.getClient(arg0).killJob(arg0);
 			long currentTimeMillis = System.currentTimeMillis();
 			long timeKillIssued = currentTimeMillis;
-			while ((currentTimeMillis < timeKillIssued + 10000L)
+			long killTimeOut =
+					conf.getLong(MRJobConfig.MR_AM_HARD_KILL_TIMEOUT_MS,
+							MRJobConfig.DEFAULT_MR_AM_HARD_KILL_TIMEOUT_MS);
+			while ((currentTimeMillis < timeKillIssued + killTimeOut)
 					&& !isJobInTerminalState(status)) {
 				try {
 					Thread.sleep(1000L);
@@ -694,7 +658,7 @@ public class YARNRunner implements ClientProtocol {
 					return;
 				}
 			}
-		} catch (IOException io) {
+		} catch(IOException io) {
 			LOG.debug("Error when checking for application status", io);
 		}
 		if (status != null && !isJobInTerminalState(status)) {
@@ -703,8 +667,8 @@ public class YARNRunner implements ClientProtocol {
 	}
 
 	@Override
-	public boolean killTask(TaskAttemptID arg0, boolean arg1)
-			throws IOException, InterruptedException {
+	public boolean killTask(TaskAttemptID arg0, boolean arg1) throws IOException,
+			InterruptedException {
 		return clientCache.getClient(arg0.getJobID()).killTask(arg0, arg1);
 	}
 
@@ -721,53 +685,25 @@ public class YARNRunner implements ClientProtocol {
 
 	@Override
 	public ProtocolSignature getProtocolSignature(String protocol,
-			long clientVersion, int clientMethodsHash) throws IOException {
-		return ProtocolSignature.getProtocolSignature(this, protocol,
-				clientVersion, clientMethodsHash);
+												  long clientVersion, int clientMethodsHash) throws IOException {
+		return ProtocolSignature.getProtocolSignature(this, protocol, clientVersion,
+				clientMethodsHash);
 	}
 
 	@Override
 	public LogParams getLogFileParams(JobID jobID, TaskAttemptID taskAttemptID)
 			throws IOException {
-		return clientCache.getClient(jobID)
-				.getLogFilePath(jobID, taskAttemptID);
+		return clientCache.getClient(jobID).getLogFilePath(jobID, taskAttemptID);
 	}
 
 	private static void warnForJavaLibPath(String opts, String component,
-			String javaConf, String envConf) {
+										   String javaConf, String envConf) {
 		if (opts != null && opts.contains("-Djava.library.path")) {
-			LOG.warn("Usage of -Djava.library.path in "
-					+ javaConf
-					+ " can cause "
-					+ "programs to no longer function if hadoop native libraries "
-					+ "are used. These values should be set as part of the "
-					+ "LD_LIBRARY_PATH in the " + component + " JVM env using "
-					+ envConf + " config settings.");
+			LOG.warn("Usage of -Djava.library.path in " + javaConf + " can cause " +
+					"programs to no longer function if hadoop native libraries " +
+					"are used. These values should be set as part of the " +
+					"LD_LIBRARY_PATH in the " + component + " JVM env using " +
+					envConf + " config settings.");
 		}
-	}
-
-	public void close() throws IOException {
-		if (resMgrDelegate != null) {
-			resMgrDelegate.close();
-			resMgrDelegate = null;
-		}
-		if (clientCache != null) {
-			clientCache.close();
-			clientCache = null;
-		}
-	}
-
-	/**
-	 * define local environment
-	 * 
-	 * @param environment
-	 */
-	private void replaceEnvironment(Map<String, String> environment) {
-		String tmpClassPath = environment.get("CLASSPATH");
-		tmpClassPath = tmpClassPath.replaceAll(";", ":");
-		tmpClassPath = tmpClassPath.replaceAll("%PWD%", "\\$PWD");
-		tmpClassPath = tmpClassPath.replaceAll("%HADOOP_MAPRED_HOME%", "\\$HADOOP_MAPRED_HOME");
-		tmpClassPath = tmpClassPath.replaceAll("\\\\", "/");
-		environment.put("CLASSPATH", tmpClassPath);
 	}
 }

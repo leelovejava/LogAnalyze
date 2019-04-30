@@ -22,9 +22,8 @@ import com.sxt.util.TimeUtil;
 
 /**
  * 编写mapreduce的runner类
- * 
- * @author root
  *
+ * @author root
  */
 public class AnalyserLogDataRunner implements Tool {
     private static final Logger logger = Logger.getLogger(AnalyserLogDataRunner.class);
@@ -70,6 +69,7 @@ public class AnalyserLogDataRunner implements Tool {
         // TableMapReduceUtil.initTableReducerJob(EventLogConstants.HBASE_NAME_EVENT_LOGS, null, job);
         // 2. 本地运行，要求参数addDependencyJars为false
         TableMapReduceUtil.initTableReducerJob(EventLogConstants.HBASE_NAME_EVENT_LOGS, null, job, null, null, null, null, false);
+        // 无需reduce,所以0
         job.setNumReduceTasks(0);
 
         // 设置输入路径
@@ -78,8 +78,8 @@ public class AnalyserLogDataRunner implements Tool {
     }
 
     /**
-     * 处理参数
-     * 
+     * 处理参数,格式 -d date=2019-04-30
+     *
      * @param conf
      * @param args
      */
@@ -104,7 +104,7 @@ public class AnalyserLogDataRunner implements Tool {
 
     /**
      * 设置job的输入路径
-     * 
+     *
      * @param job
      */
     private void setJobInputPaths(Job job) {
