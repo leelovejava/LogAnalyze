@@ -15,13 +15,19 @@ import com.sxt.transformer.model.value.reduce.MapWritableValue;
 
 /**
  * 计算new isntall user的reduce类
- * 
- * @author root
  *
+ * @author root
  */
 public class NewInstallUserReducer extends Reducer<StatsUserDimension, TimeOutputValue, StatsUserDimension, MapWritableValue> {
     private MapWritableValue outputValue = new MapWritableValue();
     private Set<String> unique = new HashSet<String>();
+
+    /**
+     * 1、接受Mapper的数据，泛型分别为：StatsUserDimension, Text, StatsUserDimension, MapWritableValue
+     * 2、使用set集合去重uuid，并统计uuid的个数
+     * 3、将KPI名称和统计出来的个数做一个映射（使用MapWritableValue对象）
+     * 4、写出即可
+     */
 
     @Override
     protected void reduce(StatsUserDimension key, Iterable<TimeOutputValue> values, Context context) throws IOException, InterruptedException {

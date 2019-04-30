@@ -29,6 +29,15 @@ public class AnalyserLogDataRunner implements Tool {
     private static final Logger logger = Logger.getLogger(AnalyserLogDataRunner.class);
     private Configuration conf = null;
 
+    /**
+     * 组装Job
+     *  设置Mapper以及Mapper的输出Key和输出Value
+     *  设置Reducer的数量为0
+     *  配置输入路径（按照传入的时间读取指定HDFS时间文件夹中的数据）
+     *  设置输出（主要是按照传入时间，创建指定HBase表，以用于数据保存输出）
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         try {
             ToolRunner.run(new Configuration(), new AnalyserLogDataRunner(), args);

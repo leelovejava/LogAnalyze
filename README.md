@@ -208,6 +208,9 @@ JS SDK
 	通过图形化展示的方式展现出来：饼图、柱状图、地图、折线图
 	ECharts、HUE、Zeppelin
 
+读取HDFS数据进行ETL清洗操作，并将最终结果写入到HBase中
+从HBase中读取数据，进行新增用户统计分析操作，并将结果写入到Mysql
+	
 ### 3、数据清洗
    [数据清洗的一些梳理](https://zhuanlan.zhihu.com/p/20571505)
    [ETL数据清洗工具总结](https://blog.csdn.net/xiaoshunzi111/article/details/51881740)
@@ -227,4 +230,19 @@ JS SDK
    
    压缩格式的选择：https://www.ibm.com/developerworks/cn/opensource/os-cn-hadoop-compression-analysis/
 
+## 参考文章
+   大数据技术之_18_大数据离线平台
+   [01_项目开发流程+大数据常用应用/分析平台/业务处理方式+数据分析平台的数据来源+数据处理的流程+项目集群的规模+需求分析+技术架构/选型](https://cloud.tencent.com/developer/article/1416395)
+   [02_Nginx+Mysql+数据收集+Web 工程 JS/JAVA SDK 讲解+Flume 故障后-如何手动上传 Nginx 日志文件至 HDFS 上](https://cloud.tencent.com/developer/article/1416504)
+   [03_数据处理+工具代码导入+业务 ETL 实现+创建数据库表](https://cloud.tencent.com/developer/article/1417289)
+   [04_数据分析 + Hive 之 hourly 分析 + 常用 Maven 仓库地址](https://cloud.tencent.com/developer/article/1418072)
    
+   [大数据项目之_15_电信客服分析平台](https://cloud.tencent.com/developer/article/1405239)
+   [大数据项目之_15_电信客服分析平台_03&04_数据分析](https://cloud.tencent.com/developer/article/1406058)
+   [大数据项目之_15_电信客服分析平台_05_数据展示+定时任务+项目总结](https://cloud.tencent.com/developer/article/1411067)
+   [大数据项目之_15_电信客服分析平台_学习总结](https://cloud.tencent.com/developer/article/1411066)
+
+## 表
+
+### hbase
+create 'eventlong','log'   

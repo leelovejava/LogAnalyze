@@ -26,6 +26,24 @@ import com.sxt.transformer.mr.TransformerBaseMapper;
  *
  */
 public class NewInstallUserMapper extends TransformerBaseMapper<StatsUserDimension, TimeOutputValue> {
+    /**
+     * 1、从Hbase中读取数据开始分析，输出Key的类型为总维度，输出Value的类型为Text（保存的是uuid）读取数据时，要验证数据有效性。
+     * 2、创建总维度对象，Text对象。
+     * 3、拼装维度
+     * 4、按照总维度聚合Text(uuid)
+     */
+
+    /**
+     * 任务组装
+     * 1、ICollector.java：将数据最终插入到Mysql时用到的SQL语句的拼装接口
+     * 2、NewInstallUserCollector.java：拼装用于插入new_install_user表的SQL语句
+     * 3、BrowserNewInstallUserCollector.java：拼装用于插入browser_new_install_user表的SQL语句
+     * 4、IDimensionConverter.java：接口，通过维度对象（每个维度对象中保存着不同的维度数据），得到维度对应的维度id。
+     * 5、DimensionConverterImpl.java：接口的具体实现类
+     * 6、TransformerMySQLOutputFormat.java：自定义OutputFormat，用于将数据写入到Mysql中
+     * 自定义TransformerRecordWriter
+     */
+
     private static final Logger logger = Logger.getLogger(NewInstallUserMapper.class);
     private StatsUserDimension statsUserDimension = new StatsUserDimension();
     private TimeOutputValue timeOutputValue = new TimeOutputValue();

@@ -27,9 +27,8 @@ import com.sxt.util.JdbcManager;
 
 /**
  * 自定义输出到mysql的outputformat类
- * 
- * @author root
  *
+ * @author root
  */
 public class TransformerOutputFormat extends OutputFormat<BaseDimension, BaseStatsValueWritable> {
     private static final Logger logger = Logger.getLogger(TransformerOutputFormat.class);
@@ -61,14 +60,13 @@ public class TransformerOutputFormat extends OutputFormat<BaseDimension, BaseSta
 
     /**
      * 自定义具体数据输出writer
-     * 
-     * @author root
      *
+     * @author root
      */
     public class TransformerRecordWriter extends RecordWriter<BaseDimension, BaseStatsValueWritable> {
-        private Connection conn = null;
-        private Configuration conf = null;
-        private IDimensionConverter converter = null;
+        private Connection conn;
+        private Configuration conf;
+        private IDimensionConverter converter;
         private Map<KpiType, PreparedStatement> map = new HashMap<KpiType, PreparedStatement>();
         private Map<KpiType, Integer> batch = new HashMap<KpiType, Integer>();
 
@@ -87,7 +85,7 @@ public class TransformerOutputFormat extends OutputFormat<BaseDimension, BaseSta
 
             try {
                 KpiType kpi = value.getKpi();
-                PreparedStatement pstmt = null;
+                PreparedStatement pstmt;
                 int count = 1;
                 if (map.get(kpi) == null) {
                     // 使用kpi进行区分，返回sql保存到config中

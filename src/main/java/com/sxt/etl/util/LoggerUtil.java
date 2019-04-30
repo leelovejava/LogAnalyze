@@ -14,18 +14,26 @@ import com.sxt.util.TimeUtil;
 
 /**
  * 处理日志数据的具体工作类
- * 
- * @author root
  *
+ * @author root
  */
 public class LoggerUtil {
     private static final Logger logger = Logger.getLogger(LoggerUtil.class);
     private static IPSeekerExt ipSeekerExt = new IPSeekerExt();
 
     /**
+     * 主要作用：将字符串数据解析成HashMap键值对集合
+     * 重要细节：
+     * 			字符串的截取
+     * 			不合法数据的过滤
+     * 			字符串的解码（就是将%相关的字符串编码转换成可读类型的数据）
+     * 			错误数据的Logger输出
+     */
+
+    /**
      * 处理日志数据logText，返回处理结果map集合<br/>
      * 如果logText没有指定数据格式，那么直接返回empty的集合
-     * 
+     *
      * @param logText
      * @return
      */
@@ -35,7 +43,8 @@ public class LoggerUtil {
             String[] splits = logText.trim().split(EventLogConstants.LOG_SEPARTIOR);
             if (splits.length == 4) {
                 // 日志格式为: ip^A服务器时间^Ahost^A请求参数
-                clientInfo.put(EventLogConstants.LOG_COLUMN_NAME_IP, splits[0].trim()); // 设置ip
+                // 设置ip
+                clientInfo.put(EventLogConstants.LOG_COLUMN_NAME_IP, splits[0].trim());
                 // 设置服务器时间
                 clientInfo.put(EventLogConstants.LOG_COLUMN_NAME_SERVER_TIME, String.valueOf(TimeUtil.parseNginxServerTime2Long(splits[1].trim())));
                 int index = splits[3].indexOf("?");
@@ -58,10 +67,10 @@ public class LoggerUtil {
 
     /**
      * 处理ip地址
-     * 
+     *
      * @param clientInfo
      */
-    private static void handleIp(Map<String,String> clientInfo) {
+    private static void handleIp(Map<String, String> clientInfo) {
         if (clientInfo.containsKey(EventLogConstants.LOG_COLUMN_NAME_IP)) {
             String ip = clientInfo.get(EventLogConstants.LOG_COLUMN_NAME_IP);
             RegionInfo info = ipSeekerExt.analyticIp(ip);
@@ -75,7 +84,7 @@ public class LoggerUtil {
 
     /**
      * 处理浏览器的userAgent信息
-     * 
+     *
      * @param clientInfo
      */
     private static void handleUserAgent(Map<String, String> clientInfo) {
@@ -92,7 +101,7 @@ public class LoggerUtil {
 
     /**
      * 处理请求参数
-     * 
+     *
      * @param requestBody
      * @param clientInfo
      */
@@ -107,7 +116,7 @@ public class LoggerUtil {
                         continue;
                     }
 
-                    String key = null, value = null;
+                    String key, value;
                     try {
                         key = param.substring(0, index);
                         value = URLDecoder.decode(param.substring(index + 1), "utf-8");

@@ -39,11 +39,20 @@ public class EventLogConstants {
          */
         EVENT(6, "event duration event", "e_e");
 
-        public final int id; // id 唯一标识
-        public final String name; // 名称
-        public final String alias; // 别名，用于数据收集的简写
+        /**
+         * id 唯一标识
+         */
+        public final int id;
+        /**
+         * 名称
+         */
+        public final String name;
+        /**
+         * 别名，用于数据收集的简写
+         */
+        public final String alias;
 
-        private EventEnum(int id, String name, String alias) {
+        EventEnum(int id, String name, String alias) {
             this.id = id;
             this.name = name;
             this.alias = alias;
