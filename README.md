@@ -212,7 +212,9 @@ JS SDK
 从HBase中读取数据，进行新增用户统计分析操作，并将结果写入到Mysql
 	
 ### 3、数据清洗
+   
    [数据清洗的一些梳理](https://zhuanlan.zhihu.com/p/20571505)
+   
    [ETL数据清洗工具总结](https://blog.csdn.net/xiaoshunzi111/article/details/51881740)
    
     预处理阶段
