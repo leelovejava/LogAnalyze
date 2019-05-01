@@ -76,13 +76,13 @@ public class RandomLog {
                 str.append("^A" + 59410 + "^A/log.gif?");
                 str.append("ver=1&pl=website&sdk=js&l=zh-CN&b_rst=1536*864&c_time="
                         + d[1]);
-
-                if ((r.nextInt(10) > 4 && uids.size() < 10000) || j < 20) {// 新用户
+                // 新用户
+                if ((r.nextInt(10) > 4 && uids.size() < 10000) || j < 20) {
                     String uid = UUID.randomUUID().toString();
                     String sid = UUID.randomUUID().toString();
                     uids.add(uid);
                     sids.add(sid);
-                    String browserInfo = browsers[r.nextInt(3)];
+                    String browserInfo = browsers[r.nextInt(browsers.length)];
                     writer.write(getP_l(str, uid, sid, browserInfo));
                     writer.write(getP_V(str, uid, sid,
                             mids[r.nextInt(mids.length)], browserInfo));
@@ -91,7 +91,7 @@ public class RandomLog {
                     int i = r.nextInt(uids.size());
                     String uid = uids.get(i);
                     String sid = sids.get(i);
-                    String browserInfo = browsers[r.nextInt(3)];
+                    String browserInfo = browsers[r.nextInt(browsers.length)];
                     writer.write(getP_V(str, uid, sid,
                             mids[r.nextInt(mids.length)], browserInfo));
                 }
