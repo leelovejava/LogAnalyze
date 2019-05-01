@@ -22,10 +22,10 @@ http{
 }
 server{
     location = /log.gif {
-              #default_type image/gif;
-              #access_log /opt/data/access.log my_format;
-              # 开启响应1x1空白图片
-              empty_gif;
+          default_type image/gif;
+          access_log /opt/data/access.log my_format;
+          # 开启响应1x1空白图片
+          empty_gif;
     }
 }
 ```

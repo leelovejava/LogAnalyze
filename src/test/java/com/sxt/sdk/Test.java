@@ -4,6 +4,9 @@ import java.util.Random;
 
 import com.sxt.client.AnalyticsEngineSDK;
 
+/**
+ * 模拟javaSDK
+ */
 public class Test {
 	public static String day = "20160607";
 	static Random r = new Random();

@@ -3,10 +3,15 @@ http://flume.apache.org/
 
 安装
 1、上传
+
 2、解压
+
 3、修改conf/flume-env.sh  文件中的JDK目录
  注意：JAVA_OPTS 配置  如果我们传输文件过大 报内存溢出时 需要修改这个配置项
+ export JAVA_OPTS="-Xms100m -Xmx2000m -Dcom.sun.management.jmxremote"
+
 4、验证安装是否成功  ./flume-ng version
+
 5、配置环境变量
 	export FLUME_HOME=/home/apache-flume-1.6.0-bin
 
@@ -27,7 +32,7 @@ Source、Channel、Sink有哪些类型
 	Legacy Sources 	          | 兼容老的Flume OG中Source（0.9.x版本）
 
     Flume Channel
-	Channel类型 	  说明
+	Channel类型 	            说明
 	Memory Channel 	           | Event数据存储在内存中
 	JDBC Channel   	           | Event数据存储在持久化存储中，当前Flume Channel内置支持Derby
 	File Channel   	           | Event数据存储在磁盘文件中
@@ -36,19 +41,19 @@ Source、Channel、Sink有哪些类型
 	Custom Channel 	           | 自定义Channel实现
 
     Flume Sink
-	Sink类型 	说明
+	Sink类型 	            说明
 	HDFS Sink 	        | 数据写入HDFS
-	Logger Sink 	      | 数据写入日志文件
+	Logger Sink 	    | 数据写入日志文件
 	Avro Sink 	        | 数据被转换成Avro Event，然后发送到配置的RPC端口上
-	Thrift Sink 	      | 数据被转换成Thrift Event，然后发送到配置的RPC端口上
-	IRC Sink    	      | 数据在IRC上进行回放
+	Thrift Sink 	    | 数据被转换成Thrift Event，然后发送到配置的RPC端口上
+	IRC Sink    	    | 数据在IRC上进行回放
 	File Roll Sink 	    | 存储数据到本地文件系统
 	Null Sink 	        | 丢弃到所有数据
 	HBase Sink 	        | 数据写入HBase数据库
 	Morphline Solr Sink | 数据发送到Solr搜索服务器（集群）
 	ElasticSearch Sink 	| 数据发送到Elastic Search搜索服务器（集群）
 	Kite Dataset Sink 	| 写数据到Kite Dataset，试验性质的
-	Custom Sink 	      | 自定义Sink实现
+	Custom Sink 	    | 自定义Sink实现
 
 
 
