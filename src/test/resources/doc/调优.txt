@@ -6,7 +6,9 @@
 	服务器调优主要包括服务器参数调优和jvm调优。在本次项目中，由于我们使用hbase作为我们分析数据的原始数据存储表，所以对于hbase我们也需要进行一些调优操作。除了参数调优之外，和其他一般的java程序一样，还需要进行一些jvm调优。
 
 	hdfs调优
-	1. dfs.datanode.failed.volumes.tolerated: 允许发生磁盘错误的磁盘数量，默认为0，表示不允许datanode发生磁盘异常。当挂载多个磁盘的时候，可以修改该值。
+	1. dfs.datanode.failed.volumes.tolerated:
+	    允许发生磁盘错误的磁盘数量，默认为0，表示不允许datanode发生磁盘异常。
+	    当挂载多个磁盘的时候，可以修改该值。(dfs.datanode.data.dir=file://${hadoop.tmp.dir}/dfs/data)
 	2. dfs.replication: 复制因子，默认3
 	3. dfs.namenode.handler.count: namenode节点并发线程量，默认10  （无ip）
 	4. dfs.datanode.handler.count：datanode之间的并发线程量，默认10。
@@ -44,6 +46,7 @@
 
 四、代码调优
 	代码调优，主要是mapper和reducer中，针对多次创建的对象，进行代码提出操作。这个和一般的java程序的代码调优一样。
+
 五、mapper调优
 	mapper调优主要就是就一个目标：减少输出量。我们可以通过增加combine阶段以及对输出进行压缩设置进行mapper调优。
 	combine介绍：
@@ -52,6 +55,7 @@
 		比较适合，map的输出是数值型的，方便进行统计。
 	压缩设置：
 		在提交job的时候分别设置启动压缩和指定压缩方式。
+
 六、reducer调优
 	reducer调优主要是通过参数调优和设置reducer的个数来完成。
 	reducer个数调优：
@@ -60,6 +64,7 @@
 			原因： map的执行process数是通过inputformat返回recordread来定义的；而reducer是有三部分构成的，分别为读取mapper输出数据、合并所有输出数据以及reduce处理，其中第一步要依赖map的执行，所以在数据量比较大的情况下，一个reducer无法满足性能要求的情况下，我们可以通过调高reducer的个数来解决该问题。
 		优点：充分利用集群的优势。
 		缺点：有些mr程序没法利用多reducer的优点，比如获取top n的mr程序。
+
 七、runner调优
 	runner调优其实就是在提交job的时候设置job参数，一般都可以通过代码和xml文件两种方式进行设置。
 	1~8详见ActiveUserRunner(before和configure方法)，9详解TransformerBaseRunner(initScans方法)
